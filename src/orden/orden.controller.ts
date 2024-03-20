@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { OrdenService } from './orden.service';
 import { UpdateOrdenDto } from './dto/update-orden.dto';
-import { generateRandomCode } from 'src/carrito/utils/carrito';
 import { ProductoTallaService } from 'src/producto-talla/producto-talla.service';
 
 @Controller('orden')
@@ -112,4 +111,15 @@ export class OrdenController {
   remove(@Param('id') id: string) {
     return this.ordenService.remove(+id);
   }
+}
+function generateRandomCode(length) {
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomCode = '';
+  for (let i = 0; i < length; i++) {
+    randomCode += characters.charAt(
+      Math.floor(Math.random() * characters.length),
+    );
+  }
+  return randomCode;
 }
