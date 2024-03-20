@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgres://default:rwKZESuYh0D1@ep-hidden-darkness-a1xlic8t.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require"
+}
+
+model Departamento {
+  id     Int      @id @default(autoincrement())
+  nombre String
+
+  ciudad Ciudad[]
+  cliente Cliente[]
+}
+
+model Ciudad {
+  id      Int   @id @default(autoincrement())
+  nombre String
+  departamento   Departamento @relation(fields: [departamentoId], references: [id])
+  departamentoId Int
+  cliente Cliente[]
+
+}
+
+model Producto {
+  id          Int    @id @default(autoincrement())
+  sku         String
+  descripcion String
+  estado      String
+  image       String
+
+  ordenDetalle      OrdenDetalle[]
+  ProductoCategaria ProductoCategaria[]
+  CarritoDetalle      CarritoDetalle[]
+  productoTalla  ProductoTalla[]
+ 
+}
+
+model Categoria {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+
+  ProductoCategaria ProductoCategaria[]
+}
+
+model ProductoCategaria {
+  producto    Producto  @relation(fields: [productoId], references: [id])
+  productoId  Int // relation scalar field (used in the `@relation` attribute above)
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId Int // relation scalar field (used in the `@relation` attribute above)
+
+  @@id([productoId, categoriaId])
+}
+
+model Cliente {
+  id       Int     @id @default(autoincrement())
+  nombre   String
+  apellido String
+  email    String  @unique
+  telefono String?
+  departamento Departamento  @relation(fields: [departamentoId], references: [id])
+  departamentoId Int
+  direccion String
+
+  ciudad Ciudad  @relation(fields: [ciudadId], references: [id])
+  ciudadId Int
+  Orden    Orden[]
+  carritos  Carrito[]
+  
+}
+
+model Orden {
+  id     Int      @id @default(autoincrement())
+  codigo String
+  total  Int 
+  fecha  DateTime @default(now())
+
+  cliente      Cliente        @relation(fields: [clienteId], references: [id])
+  clienteId    Int
+  OrdenDetalle OrdenDetalle[]
+}
+
+model OrdenDetalle {
+  id      Int   @id @default(autoincrement())
+  orden   Orden @relation(fields: [ordenId], references: [id])
+  ordenId Int
+
+  Producto   Producto? @relation(fields: [productoId], references: [id])
+  productoId Int?
+
+  talla  Talla ? @relation(fields: [tallaId], references: [id])
+  tallaId Int
+  cantidad   Int
+  
+}
+
+model Role {
+  id   Int    @unique @default(autoincrement())
+  name String @db.VarChar()
+
+  User User[]
+
+  @@map("roles")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+
+  role   Role @relation(fields: [roleId], references: [id])
+  roleId Int
+}
+
+model Carrito {
+  id     Int      @id @default(autoincrement())
+  total  Float
+  fecha  DateTime @default(now())
+
+  cliente      Cliente        @relation(fields: [clienteId], references: [id])
+  clienteId    Int
+  carritoDetalle CarritoDetalle[]
+}
+
+model Talla {
+  id      Int   @id @default(autoincrement())
+  nombre String
+  
+  ProductoTalla ProductoTalla[]
+  CarritoDetalle CarritoDetalle[]
+  OrdenDetalle OrdenDetalle []
+}
+
+model CarritoDetalle {
+  id      Int   @id @default(autoincrement())
+  carrito   Carrito @relation(fields: [carritoId], references: [id])
+  carritoId Int
+  cantidad   Int
+  Producto   Producto? @relation(fields: [productoId], references: [id])
+  productoId Int?
+  talla      Talla       @relation(fields: [tallaId], references: [id])
+  tallaId    Int  
+}
+
+model ProductoTalla {
+  cantidad   Int
+  precio Int
+  producto    Producto  @relation(fields: [productoId], references: [id])
+  productoId  Int // relation scalar field (used in the `@relation` attribute above)
+  talla   Talla @relation(fields: [tallaId], references: [id])
+  tallaId Int // relation scalar field (used in the `@relation` attribute above)
+
+  @@id([productoId, tallaId])
+}
