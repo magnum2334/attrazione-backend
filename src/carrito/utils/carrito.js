@@ -1,4 +1,4 @@
-export function generateRandomCode(length: number): string {
+export function generateRandomCode(length)  {
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomCode = '';
